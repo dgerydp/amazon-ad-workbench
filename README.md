@@ -21,13 +21,6 @@ An open-source Amazon advertising analysis workbench built around `sellerSKU`.
 - 领星 API 补充店铺和 sellerSKU 信息
 - 多模型 AI 支持
 
-当前明确不做：
-
-- internal SKU 映射
-- 内部分级分类统计
-- Amazon SP-API 接入
-- 广告自动回写
-
 ## For Beginners
 
 If you want to try the project with the least amount of setup:
@@ -42,8 +35,6 @@ You do not need:
 
 - AI keys
 - Lingxing credentials
-- internal SKU mappings
-- Amazon SP-API
 
 ## Why This Repo Exists
 
