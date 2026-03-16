@@ -47,6 +47,22 @@ cd amazon-ad-workbench
 .\start-all.ps1
 ```
 
+如果你就是想“双击就跑”，直接双击：
+
+- `one-click-start.bat`
+
+或者执行：
+
+```powershell
+.\one-click-start.ps1
+```
+
+这个启动器会自动：
+
+- 检查 `python` 和 `npm` 是否可用
+- 分别启动后端和前端
+- 自动打开浏览器
+
 ## 手工启动方式
 
 ### 第一步：启动后端

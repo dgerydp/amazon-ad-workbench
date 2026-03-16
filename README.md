@@ -144,7 +144,25 @@ Or:
 .\start-all.ps1
 ```
 
-### Option 3: Docker Compose
+### Option 3: One-click startup for Windows beginners
+
+If you are on Windows and just want to launch the project with one action:
+
+- double-click `one-click-start.bat`
+
+Or run:
+
+```powershell
+.\one-click-start.ps1
+```
+
+This launcher:
+
+- checks that `python` and `npm` are available
+- starts backend and frontend in separate windows
+- opens the browser automatically
+
+### Option 4: Docker Compose
 
 From the repository root:
 
