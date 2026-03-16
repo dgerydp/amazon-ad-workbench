@@ -1,46 +1,146 @@
 # Quick Start
 
-## Start Paths
+## Before You Start
 
-### Path 1: Demo Mode
+Clone the repository first:
 
-- Open the app
-- choose `Demo Mode`
-- review built-in examples
+```bash
+git clone https://github.com/dongerydp/amazon-ad-workbench.git
+cd amazon-ad-workbench
+```
 
-### Path 2: Quick Start Mode
+If you do not want to use Git, you can also download the repository ZIP from GitHub and extract it locally.
 
-- upload a Search Term Report
-- upload an Advertised Product Report
-- run analysis
-- export results
+## Fastest Beginner Path
 
-### Path 3: Enhanced Mode
+The simplest path is:
 
-- connect Lingxing
-- sync shops and sellerSKU
-- add an AI provider key
-- rerun analysis
+1. start the backend
+2. start the frontend
+3. open the app
+4. click `Load Demo Data`
+5. review `Reports`, `Analysis`, `Tags`, and `Exports`
 
-## Beginner-Friendly Defaults
+You do not need:
 
-- built-in rules enabled
-- AI optional
-- no mapping setup required
-- Chinese-first error messages
+- AI keys
+- Lingxing credentials
+- Amazon SP-API
+- internal SKU mappings
 
-## Minimum Data Needed
+## Windows
 
-To get useful results without any integration:
+From the repository root:
 
-- one Search Term Report
-- one Advertised Product Report
+```powershell
+.\start-backend.ps1
+.\start-frontend.ps1
+```
 
-## Expected First Outputs
+Or run both:
+
+```powershell
+.\start-all.ps1
+```
+
+## Manual Startup
+
+### Backend
+
+From the repository root:
+
+```bash
+cd backend
+python -m venv .venv
+```
+
+Activate the virtual environment:
+
+Windows PowerShell:
+
+```powershell
+.\.venv\Scripts\activate
+```
+
+macOS / Linux:
+
+```bash
+source .venv/bin/activate
+```
+
+Install dependencies and start the API:
+
+```bash
+pip install -r requirements.txt -r requirements-dev.txt
+uvicorn app.main:app --reload --port 8080
+```
+
+Health check:
+
+- `http://127.0.0.1:8080/health`
+
+### Frontend
+
+From the repository root:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Typical local URL:
+
+- `http://127.0.0.1:3000`
+
+## Real Data Flow
+
+If you want to use your own data, prepare:
+
+- one `Search Term Report`
+- one `Advertised Product Report`
+
+Then:
+
+1. open `Reports`
+2. upload both reports
+3. open `Analysis`
+4. click `Run Analysis`
+5. open `Tags`
+6. open `Exports`
+
+## Optional Enhancements
+
+### AI
+
+Open `AI Providers` and add:
+
+- provider
+- API key
+- optional base URL
+- optional model
+
+Then go back to `Analysis` and enable `Enable AI Tagging`.
+
+### Lingxing
+
+Open `Lingxing` and fill:
+
+- `App ID`
+- `App Secret`
+- `Base URL`
+
+Then use:
+
+- `Test Connection`
+- `Sync Shops`
+- `Sync sellerSKU`
+
+## Expected Outputs
 
 - high performance terms
 - potential terms
 - expensive no-order terms
 - negative keyword suggestions
 - sellerSKU summary
-
+- full Excel workbook

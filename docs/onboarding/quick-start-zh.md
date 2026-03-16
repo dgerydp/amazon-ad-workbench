@@ -1,36 +1,85 @@
 # 快速开始（中文）
 
-## 这个项目适合谁
+## 开始前先做什么
 
-这个项目适合：
+先把仓库拉到本地：
 
-- 想直接分析亚马逊广告搜索词的小团队
-- 没有内部 SKU 映射体系的卖家
-- 想基于 `sellerSKU` 看广告词表现的人
-- 想先用规则分析，后续再接 AI 的用户
+```bash
+git clone https://github.com/dongerydp/amazon-ad-workbench.git
+cd amazon-ad-workbench
+```
 
-这个项目不要求你先准备：
+如果你不用 Git，也可以直接在 GitHub 页面下载 ZIP，然后解压到本地。
 
-- internal SKU 映射表
-- Amazon SP-API
+## 小白最简单的启用方式
+
+最简单的流程就是：
+
+1. 启动后端
+2. 启动前端
+3. 打开页面
+4. 点击 `Load Demo Data`
+5. 依次查看：
+   - `Reports`
+   - `Analysis`
+   - `Tags`
+   - `Exports`
+
+第一次体验时你不需要：
+
 - AI Key
 - 领星账号
+- Amazon SP-API
+- internal SKU 映射
 
-## 小白怎么启用
+## Windows 一键启动
 
-最简单的方式就是先跑本地，再点示例数据。
+在仓库根目录运行：
+
+```powershell
+.\start-backend.ps1
+.\start-frontend.ps1
+```
+
+或者直接一起启动：
+
+```powershell
+.\start-all.ps1
+```
+
+## 手工启动方式
 
 ### 第一步：启动后端
 
-```powershell
-cd D:\amazon-ad-workbench\backend
+在仓库根目录执行：
+
+```bash
+cd backend
 python -m venv .venv
-.venv\Scripts\activate
+```
+
+激活虚拟环境：
+
+Windows PowerShell：
+
+```powershell
+.\.venv\Scripts\activate
+```
+
+macOS / Linux：
+
+```bash
+source .venv/bin/activate
+```
+
+安装依赖并启动后端：
+
+```bash
 pip install -r requirements.txt -r requirements-dev.txt
 uvicorn app.main:app --reload --port 8080
 ```
 
-启动后端成功后，访问：
+启动成功后，访问：
 
 - `http://127.0.0.1:8080/health`
 
@@ -38,13 +87,15 @@ uvicorn app.main:app --reload --port 8080
 
 ### 第二步：启动前端
 
-```powershell
-cd D:\amazon-ad-workbench\frontend
+回到仓库根目录后执行：
+
+```bash
+cd frontend
 npm install
 npm run dev
 ```
 
-启动后前端地址通常是：
+前端地址通常是：
 
 - `http://127.0.0.1:3000`
 
@@ -59,13 +110,13 @@ npm run dev
    - 示例 sellerSKU
    - 示例广告报表
    - 一次完整分析结果
-4. 再按顺序看：
+4. 再按顺序查看：
    - `Reports`
    - `Analysis`
    - `Tags`
    - `Exports`
 
-这条路径最适合第一次看项目，不需要任何外部账号。
+这条路径最适合第一次体验项目，不需要任何外部账号。
 
 ## 真实数据怎么用
 
@@ -81,7 +132,7 @@ npm run dev
 3. 上传投放商品报表
 4. 打开 `Analysis`
 5. 点击 `Run Analysis`
-6. 去 `Tags` 看打标结果
+6. 去 `Tags` 查看打标结果
 7. 去 `Exports` 下载结果
 
 ## 不配 AI 能不能用
@@ -141,7 +192,7 @@ npm run dev
 
 ## 常见问题
 
-### 1. 我只上传了一个报表，能分析吗
+### 1. 我只上传了一份报表，能分析吗
 
 不建议。这个项目最少要两份报表一起使用：
 

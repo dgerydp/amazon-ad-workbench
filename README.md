@@ -93,22 +93,45 @@ Notes:
 
 ## Quick Start
 
+Clone first:
+
+```bash
+git clone https://github.com/dongerydp/amazon-ad-workbench.git
+cd amazon-ad-workbench
+```
+
 ### Option 1: Fastest local startup
 
 Backend:
 
-```powershell
-cd D:\amazon-ad-workbench\backend
+```bash
+cd backend
 python -m venv .venv
-.venv\Scripts\activate
+```
+
+Windows PowerShell:
+
+```powershell
+.\.venv\Scripts\activate
+```
+
+macOS / Linux:
+
+```bash
+source .venv/bin/activate
+```
+
+Then:
+
+```bash
 pip install -r requirements.txt -r requirements-dev.txt
 uvicorn app.main:app --reload --port 8080
 ```
 
 Frontend:
 
-```powershell
-cd D:\amazon-ad-workbench\frontend
+```bash
+cd ../frontend
 npm install
 npm run dev
 ```
@@ -132,8 +155,9 @@ Or:
 
 ### Option 3: Docker Compose
 
-```powershell
-cd D:\amazon-ad-workbench
+From the repository root:
+
+```bash
 docker compose up --build
 ```
 
@@ -218,14 +242,14 @@ examples/  sample input reports
 Backend:
 
 ```powershell
-cd D:\amazon-ad-workbench\backend
+cd backend
 .\.venv\Scripts\python.exe -m pytest -q
 ```
 
 Frontend:
 
-```powershell
-cd D:\amazon-ad-workbench\frontend
+```bash
+cd frontend
 npm run build
 ```
 
