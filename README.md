@@ -9,9 +9,16 @@ An open-source Amazon advertising analysis workbench built around `sellerSKU`.
 
 ## 中文简介
 
-这是一个围绕 `sellerSKU` 的亚马逊广告分析开源项目，核心目标是让没有内部 ERP 映射、没有内部 SKU 体系的小团队也能直接用起来。
+这是一个围绕 `sellerSKU` 的亚马逊广告分析开源项目。
 
-项目重点：
+目标很直接：
+
+- 不依赖内部 ERP 映射
+- 不依赖内部 SKU 体系
+- 不要求先接复杂接口
+- 先把广告报表分析跑通
+
+核心能力：
 
 - 搜索词报表分析
 - 投放商品报表分析

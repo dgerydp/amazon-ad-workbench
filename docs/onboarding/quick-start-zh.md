@@ -9,11 +9,11 @@ git clone https://github.com/dongerydp/amazon-ad-workbench.git
 cd amazon-ad-workbench
 ```
 
-如果你不用 Git，也可以直接在 GitHub 页面下载 ZIP，然后解压到本地。
+不用 Git 也没关系，直接在 GitHub 页面下载 ZIP，解压后一样能启动。
 
 ## 小白最简单的启用方式
 
-最简单的流程就是：
+第一次使用，直接走这条路径：
 
 1. 启动后端
 2. 启动前端
@@ -25,7 +25,7 @@ cd amazon-ad-workbench
    - `Tags`
    - `Exports`
 
-第一次体验时你不需要：
+第一次体验不需要准备这些东西：
 
 - AI Key
 - 领星账号
@@ -34,7 +34,7 @@ cd amazon-ad-workbench
 
 ## Windows 一键启动
 
-在仓库根目录运行：
+想自己手动开两个窗口，就在仓库根目录运行：
 
 ```powershell
 .\start-backend.ps1
@@ -47,7 +47,7 @@ cd amazon-ad-workbench
 .\start-all.ps1
 ```
 
-如果你就是想“双击就跑”，直接双击：
+想双击就跑，直接双击：
 
 - `one-click-start.bat`
 
@@ -57,7 +57,7 @@ cd amazon-ad-workbench
 .\one-click-start.ps1
 ```
 
-这个启动器会自动：
+这个启动器会自动完成：
 
 - 检查 `python` 和 `npm` 是否可用
 - 分别启动后端和前端
@@ -121,7 +121,7 @@ npm run dev
 
 1. 打开首页 `Overview`
 2. 点击 `Load Demo Data`
-3. 系统会自动导入：
+3. 系统自动导入：
    - 示例店铺
    - 示例 sellerSKU
    - 示例广告报表
@@ -132,16 +132,16 @@ npm run dev
    - `Tags`
    - `Exports`
 
-这条路径最适合第一次体验项目，不需要任何外部账号。
+这是最快看懂项目的方式，不需要任何外部账号。
 
 ## 真实数据怎么用
 
-如果你要分析自己的数据，至少准备 2 份报表：
+要分析真实数据，至少准备 2 份报表：
 
 - `Search Term Report`
 - `Advertised Product Report`
 
-然后：
+然后按这个顺序操作：
 
 1. 打开 `Reports`
 2. 上传搜索词报表
@@ -165,7 +165,7 @@ npm run dev
 
 ## AI 怎么启用
 
-如果你想启用 AI：
+要启用 AI，按这个顺序做：
 
 1. 打开 `AI Providers`
 2. 选择一个模型提供商
@@ -185,7 +185,7 @@ npm run dev
 
 ## 领星怎么启用
 
-如果你想用领星补充店铺和 sellerSKU：
+要接入领星补充店铺和 sellerSKU，按这个顺序做：
 
 1. 打开 `Lingxing`
 2. 填写：
