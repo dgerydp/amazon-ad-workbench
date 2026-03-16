@@ -1,32 +1,58 @@
 # Amazon Ad Workbench
 
-An open source Amazon advertising analysis workbench built around `sellerSKU`.
+An open-source Amazon advertising analysis workbench built around `sellerSKU`.
 
-This project focuses on:
+中文说明见：
 
-- Search Term Report analysis
-- Advertised Product Report analysis
-- sellerSKU-level attribution
-- tokenization and semantic tagging
-- rule-based action suggestions
-- Lingxing API enrichment
-- multi-provider AI support
+- [快速开始（中文）](./docs/onboarding/quick-start-zh.md)
+- [部署说明（中文）](./docs/onboarding/deployment-zh.md)
 
-This project explicitly does not include:
+## 中文简介
 
-- internal SKU mapping
-- internal category statistics
-- Amazon SP-API integration
-- ad write-back in the current release
+这是一个围绕 `sellerSKU` 的亚马逊广告分析开源项目，核心目标是让没有内部 ERP 映射、没有内部 SKU 体系的小团队也能直接用起来。
+
+项目重点：
+
+- 搜索词报表分析
+- 投放商品报表分析
+- sellerSKU 维度归因
+- 搜索词拆词和语义打标
+- 规则引擎建议
+- 领星 API 补充店铺和 sellerSKU 信息
+- 多模型 AI 支持
+
+当前明确不做：
+
+- internal SKU 映射
+- 内部分级分类统计
+- Amazon SP-API 接入
+- 广告自动回写
+
+## For Beginners
+
+If you want to try the project with the least amount of setup:
+
+1. Start the backend.
+2. Start the frontend.
+3. Open the app.
+4. Click `Load Demo Data`.
+5. Review `Reports`, `Analysis`, `Tags`, and `Exports`.
+
+You do not need:
+
+- AI keys
+- Lingxing credentials
+- internal SKU mappings
+- Amazon SP-API
 
 ## Why This Repo Exists
 
-Most internal ad-analysis systems are tightly coupled to ERP mappings, internal SKU trees, and private operational logic. This repository strips that away and keeps only the core open-source layer:
+Most internal ad-analysis systems are tightly coupled to ERP mappings, internal SKU trees, and private operational logic. This repository keeps only the open-source core:
 
 - import ad reports
-- link terms to sellerSKU when possible
+- link terms to sellerSKU where possible
 - split search terms into tokens
-- tag tokens with AI or heuristic fallback
+- tag tokens with AI or a heuristic fallback
 - apply built-in rules
 - export actionable files
 
@@ -123,10 +149,10 @@ Services:
 1. Open the dashboard.
 2. Click `Load Demo Data` to bootstrap a demo shop, sample sellerSKU records, sample reports, and a completed analysis job.
 3. Review:
-   - `报表中心`
-   - `分析中心`
-   - `标签`
-   - `导出`
+   - `Reports`
+   - `Analysis`
+   - `Tags`
+   - `Exports`
 4. If you want to use real data, upload:
    - `Search Term Report`
    - `Advertised Product Report`
@@ -183,7 +209,9 @@ examples/  sample input reports
 - [docs/architecture/data-model-outline.md](./docs/architecture/data-model-outline.md)
 - [docs/api/api-outline.md](./docs/api/api-outline.md)
 - [docs/onboarding/quick-start.md](./docs/onboarding/quick-start.md)
+- [docs/onboarding/quick-start-zh.md](./docs/onboarding/quick-start-zh.md)
 - [docs/onboarding/deployment.md](./docs/onboarding/deployment.md)
+- [docs/onboarding/deployment-zh.md](./docs/onboarding/deployment-zh.md)
 
 ## Development Checks
 
@@ -191,7 +219,7 @@ Backend:
 
 ```powershell
 cd D:\amazon-ad-workbench\backend
-pytest -q
+.\.venv\Scripts\python.exe -m pytest -q
 ```
 
 Frontend:
