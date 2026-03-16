@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button, Card, Form, Select, Space, Table, Typography, Upload, message } from "antd";
 import type { UploadFile } from "antd/es/upload/interface";
 
+import { useLocale } from "../i18n/LocaleProvider";
 import { api } from "../services/api";
 
 const { Title, Paragraph } = Typography;
@@ -9,13 +10,14 @@ const { Title, Paragraph } = Typography;
 export function UploadsPage() {
   const [form] = Form.useForm<{ shop_id?: number }>();
   const queryClient = useQueryClient();
+  const { t } = useLocale();
   const shops = useQuery({ queryKey: ["shops"], queryFn: api.listShops });
   const batches = useQuery({ queryKey: ["batches"], queryFn: api.listBatches });
 
   const demoBootstrap = useMutation({
     mutationFn: () => api.bootstrapDemo({ reset: false, use_ai: false }),
     onSuccess: () => {
-      message.success("Demo data loaded");
+      message.success(t("message.reportsDemoLoaded"));
       queryClient.invalidateQueries({ queryKey: ["batches"] });
       queryClient.invalidateQueries({ queryKey: ["shops"] });
       queryClient.invalidateQueries({ queryKey: ["seller-skus"] });
@@ -25,7 +27,7 @@ export function UploadsPage() {
   const searchUpload = useMutation({
     mutationFn: ({ file, shopId }: { file: File; shopId?: number }) => api.uploadSearchTerms(file, shopId),
     onSuccess: () => {
-      message.success("Search term report uploaded");
+      message.success(t("message.searchUploaded"));
       queryClient.invalidateQueries({ queryKey: ["batches"] });
     },
   });
@@ -33,7 +35,7 @@ export function UploadsPage() {
   const productUpload = useMutation({
     mutationFn: ({ file, shopId }: { file: File; shopId?: number }) => api.uploadAdvertisedProducts(file, shopId),
     onSuccess: () => {
-      message.success("Advertised product report uploaded");
+      message.success(t("message.productUploaded"));
       queryClient.invalidateQueries({ queryKey: ["batches"] });
     },
   });
@@ -54,18 +56,15 @@ export function UploadsPage() {
   return (
     <Space direction="vertical" size={24} style={{ display: "flex" }}>
       <div>
-        <Title level={2}>Reports</Title>
-        <Paragraph>
-          Upload a Search Term Report and an Advertised Product Report. This project does not perform internal SKU mapping and
-          works directly on sellerSKU.
-        </Paragraph>
+        <Title level={2}>{t("reports.title")}</Title>
+        <Paragraph>{t("reports.desc")}</Paragraph>
       </div>
       <Card style={{ borderRadius: 16 }}>
         <Form form={form} layout="vertical">
-          <Form.Item name="shop_id" label="Linked Shop">
+          <Form.Item name="shop_id" label={t("reports.linkedShop")}>
             <Select
               allowClear
-              placeholder="Optional. Leave empty to import as global data"
+              placeholder={t("reports.linkedShopPlaceholder")}
               options={(shops.data ?? []).map((shop) => ({
                 value: shop.id,
                 label: `${shop.name} / ${shop.marketplace}`,
@@ -75,30 +74,30 @@ export function UploadsPage() {
           <Space wrap>
             <Upload beforeUpload={beforeUpload("search")} showUploadList={false}>
               <Button type="primary" loading={searchUpload.isPending}>
-                Upload Search Term Report
+                {t("reports.uploadSearch")}
               </Button>
             </Upload>
             <Upload beforeUpload={beforeUpload("product")} showUploadList={false}>
-              <Button loading={productUpload.isPending}>Upload Advertised Product Report</Button>
+              <Button loading={productUpload.isPending}>{t("reports.uploadProduct")}</Button>
             </Upload>
             <Button onClick={() => demoBootstrap.mutate()} loading={demoBootstrap.isPending}>
-              Load Demo Data
+              {t("reports.loadDemo")}
             </Button>
           </Space>
         </Form>
       </Card>
-      <Card title="Import Batches" style={{ borderRadius: 16 }}>
+      <Card title={t("reports.importBatches")} style={{ borderRadius: 16 }}>
         <Table
           rowKey="id"
           dataSource={batches.data ?? []}
           columns={[
-            { title: "ID", dataIndex: "id" },
-            { title: "Type", dataIndex: "report_type" },
-            { title: "Filename", dataIndex: "filename" },
-            { title: "Status", dataIndex: "status" },
-            { title: "Rows", dataIndex: "row_count" },
-            { title: "Start", dataIndex: "date_range_start" },
-            { title: "End", dataIndex: "date_range_end" },
+            { title: t("common.id"), dataIndex: "id" },
+            { title: t("common.type"), dataIndex: "report_type" },
+            { title: t("common.filename"), dataIndex: "filename" },
+            { title: t("common.status"), dataIndex: "status" },
+            { title: t("common.rows"), dataIndex: "row_count" },
+            { title: t("common.start"), dataIndex: "date_range_start" },
+            { title: t("common.end"), dataIndex: "date_range_end" },
           ]}
         />
       </Card>

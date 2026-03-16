@@ -57,6 +57,29 @@ export interface ProviderConfigResponse {
   enabled: boolean;
 }
 
+export interface ProviderListResponse {
+  defaults: Array<{
+    provider: string;
+    label: string;
+    mode: string;
+  }>;
+  configs: Array<{
+    id: number;
+    provider: string;
+    base_url?: string | null;
+    model?: string | null;
+    enabled: boolean;
+  }>;
+}
+
+export interface ProviderModelsResponse {
+  provider: string;
+  source: "live" | "preset";
+  models: string[];
+  selected_model?: string | null;
+  message?: string | null;
+}
+
 export interface DemoBootstrapResult {
   ok: boolean;
   shop_id: number;

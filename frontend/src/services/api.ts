@@ -4,6 +4,8 @@ import type {
   DemoBootstrapResult,
   OverviewStats,
   ProviderConfigResponse,
+  ProviderListResponse,
+  ProviderModelsResponse,
   ReportBatch,
   SellerSku,
   Shop,
@@ -49,7 +51,9 @@ export const api = {
     (await http.post<AnalysisJobResult>("/analysis/run", payload)).data,
   listAnalysisJobs: async () => (await http.get("/analysis/jobs")).data,
 
-  listProviders: async () => (await http.get("/providers")).data,
+  listProviders: async () => (await http.get<ProviderListResponse>("/providers")).data,
+  listProviderModels: async (provider: string) =>
+    (await http.get<ProviderModelsResponse>("/providers/models", { params: { provider } })).data,
   testProvider: async (payload: { provider: string; api_key?: string; base_url?: string; model?: string }) =>
     (await http.post("/providers/test", payload)).data,
   saveProviderConfig: async (payload: {

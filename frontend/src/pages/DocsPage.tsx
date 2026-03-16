@@ -1,17 +1,21 @@
 import { Card, Col, Row, Space, Typography } from "antd";
 
+import { useLocale } from "../i18n/LocaleProvider";
+
 const { Title, Paragraph, Text } = Typography;
 
 export function DocsPage() {
+  const { t } = useLocale();
+
   return (
     <Space direction="vertical" size={24} style={{ display: "flex" }}>
       <div>
-        <Title level={2}>Docs</Title>
-        <Paragraph>Use this page as a quick guide to the repository documentation. The actual markdown files live in the root docs folder.</Paragraph>
+        <Title level={2}>{t("docs.title")}</Title>
+        <Paragraph>{t("docs.desc")}</Paragraph>
       </div>
       <Row gutter={[16, 16]}>
         <Col xs={24} md={12}>
-          <Card title="Recommended Reading Order" style={{ borderRadius: 16 }}>
+          <Card title={t("docs.readingOrder")} style={{ borderRadius: 16 }}>
             <Space direction="vertical">
               <Text>1. docs/prd/project-overview.md</Text>
               <Text>2. docs/architecture/system-design.md</Text>
@@ -22,13 +26,13 @@ export function DocsPage() {
           </Card>
         </Col>
         <Col xs={24} md={12}>
-          <Card title="Current Capability Snapshot" style={{ borderRadius: 16 }}>
+          <Card title={t("docs.snapshot")} style={{ borderRadius: 16 }}>
             <Space direction="vertical">
-              <Text>Demo data bootstrap is available</Text>
-              <Text>Two report types are supported</Text>
-              <Text>sellerSKU attribution and token tagging are implemented</Text>
-              <Text>OpenAI, Claude, Gemini, DeepSeek, Qwen, and Doubao are supported</Text>
-              <Text>Lingxing connection test and basic sync are included</Text>
+              <Text>{t("docs.snapshot.demo")}</Text>
+              <Text>{t("docs.snapshot.reports")}</Text>
+              <Text>{t("docs.snapshot.tags")}</Text>
+              <Text>{t("docs.snapshot.providers")}</Text>
+              <Text>{t("docs.snapshot.lingxing")}</Text>
             </Space>
           </Card>
         </Col>

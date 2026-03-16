@@ -61,3 +61,13 @@ def test_demo_bootstrap():
         payload = response.json()
         assert payload["ok"] is True
         assert payload["analysis_status"] == "completed"
+
+
+def test_provider_models_fallback():
+    with TestClient(app) as client:
+        response = client.get("/api/providers/models", params={"provider": "openai"})
+        assert response.status_code == 200
+        payload = response.json()
+        assert payload["provider"] == "openai"
+        assert payload["models"]
+        assert payload["source"] in {"live", "preset"}

@@ -15,3 +15,10 @@ class ProviderConfigCreate(BaseModel):
     api_key: str | None = None
     enabled: bool = True
 
+
+class ProviderModelsResponse(BaseModel):
+    provider: str
+    source: str
+    models: list[str]
+    selected_model: str | None = None
+    message: str | None = None

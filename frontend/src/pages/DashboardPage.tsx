@@ -3,6 +3,7 @@ import { Button, Card, Col, Row, Space, Table, Tag, Typography, message } from "
 import { useNavigate } from "react-router-dom";
 
 import { StatCard } from "../components/StatCard";
+import { useLocale } from "../i18n/LocaleProvider";
 import { api } from "../services/api";
 
 const { Title, Paragraph } = Typography;
@@ -10,6 +11,7 @@ const { Title, Paragraph } = Typography;
 export function DashboardPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { t } = useLocale();
   const overview = useQuery({ queryKey: ["overview"], queryFn: api.getOverview });
   const ruleHits = useQuery({ queryKey: ["rule-hits"], queryFn: api.getRuleHits });
   const skuInsights = useQuery({ queryKey: ["seller-sku-insights"], queryFn: api.getSellerSkuInsights });
@@ -22,7 +24,7 @@ export function DashboardPage() {
   const demoBootstrap = useMutation({
     mutationFn: () => api.bootstrapDemo({ reset: false, use_ai: false }),
     onSuccess: (data) => {
-      message.success(`Demo data loaded: ${data.shop_name}`);
+      message.success(t("message.demoLoaded", { name: data.shop_name }));
       [
         "overview",
         "rule-hits",
@@ -41,42 +43,39 @@ export function DashboardPage() {
   return (
     <Space direction="vertical" size={24} style={{ display: "flex" }}>
       <div>
-        <Title level={2}>Overview</Title>
-        <Paragraph>
-          This repository is an open-source Amazon ad analysis workbench centered on sellerSKU. You can bootstrap demo data
-          to explore the full flow, or upload your own Search Term Report and Advertised Product Report.
-        </Paragraph>
+        <Title level={2}>{t("dashboard.title")}</Title>
+        <Paragraph>{t("dashboard.desc")}</Paragraph>
         <Space wrap>
           <Button type="primary" size="large" onClick={() => demoBootstrap.mutate()} loading={demoBootstrap.isPending}>
-            Load Demo Data
+            {t("dashboard.loadDemo")}
           </Button>
           <Button size="large" onClick={() => navigate("/uploads")}>
-            Upload Reports
+            {t("dashboard.uploadReports")}
           </Button>
           <Button size="large" onClick={() => navigate("/analysis")}>
-            Run Analysis
+            {t("dashboard.runAnalysis")}
           </Button>
         </Space>
       </div>
 
       <Row gutter={[16, 16]}>
         <Col xs={24} md={6}>
-          <StatCard title="Search Term Rows" value={overview.data?.search_term_reports ?? 0} />
+          <StatCard title={t("dashboard.searchRows")} value={overview.data?.search_term_reports ?? 0} />
         </Col>
         <Col xs={24} md={6}>
-          <StatCard title="Advertised Product Rows" value={overview.data?.advertised_products ?? 0} />
+          <StatCard title={t("dashboard.productRows")} value={overview.data?.advertised_products ?? 0} />
         </Col>
         <Col xs={24} md={6}>
-          <StatCard title="Tokens" value={overview.data?.tokens ?? 0} />
+          <StatCard title={t("dashboard.tokens")} value={overview.data?.tokens ?? 0} />
         </Col>
         <Col xs={24} md={6}>
-          <StatCard title="Rule Hits" value={overview.data?.rule_hits ?? 0} />
+          <StatCard title={t("dashboard.ruleHits")} value={overview.data?.rule_hits ?? 0} />
         </Col>
       </Row>
 
       <Row gutter={[16, 16]}>
         <Col xs={24} lg={12}>
-          <Card title="sellerSKU Summary" style={{ borderRadius: 16 }}>
+          <Card title={t("dashboard.skuSummary")} style={{ borderRadius: 16 }}>
             <Table
               rowKey={(record) => String(record.seller_sku ?? record.token_count ?? Math.random())}
               size="small"
@@ -84,33 +83,33 @@ export function DashboardPage() {
               dataSource={skuRows}
               columns={[
                 { title: "sellerSKU", dataIndex: "seller_sku" },
-                { title: "Token Count", dataIndex: "token_count" },
-                { title: "Clicks", dataIndex: "clicks" },
-                { title: "Orders", dataIndex: "orders" },
-                { title: "Spend", dataIndex: "spend" },
-                { title: "Sales", dataIndex: "sales" },
+                { title: t("dashboard.tokenCount"), dataIndex: "token_count" },
+                { title: t("common.clicks"), dataIndex: "clicks" },
+                { title: t("common.orders"), dataIndex: "orders" },
+                { title: t("common.spend"), dataIndex: "spend" },
+                { title: t("common.sales"), dataIndex: "sales" },
               ]}
             />
           </Card>
         </Col>
         <Col xs={24} lg={12}>
-          <Card title="Rule Hits" style={{ borderRadius: 16 }}>
+          <Card title={t("dashboard.ruleHits")} style={{ borderRadius: 16 }}>
             <Table
               rowKey={(record) => String(record.id ?? Math.random())}
               size="small"
               pagination={{ pageSize: 8 }}
               dataSource={ruleRows}
               columns={[
-                { title: "Rule", dataIndex: "rule_name" },
-                { title: "Action", dataIndex: "action_type" },
-                { title: "Target ID", dataIndex: "target_id" },
+                { title: t("dashboard.rule"), dataIndex: "rule_name" },
+                { title: t("common.action"), dataIndex: "action_type" },
+                { title: t("dashboard.targetId"), dataIndex: "target_id" },
               ]}
             />
           </Card>
         </Col>
       </Row>
 
-      <Card title="Tag Distribution" style={{ borderRadius: 16 }}>
+      <Card title={t("dashboard.tagDistribution")} style={{ borderRadius: 16 }}>
         <Space wrap size={[12, 12]}>
           {tagRows.length ? (
             tagRows.map((item) => (
@@ -119,7 +118,7 @@ export function DashboardPage() {
               </Tag>
             ))
           ) : (
-            <Paragraph style={{ marginBottom: 0 }}>No tags yet. Upload reports and run analysis first.</Paragraph>
+            <Paragraph style={{ marginBottom: 0 }}>{t("dashboard.noTags")}</Paragraph>
           )}
         </Space>
       </Card>

@@ -10,8 +10,10 @@ import {
   ShopOutlined,
   TagsOutlined,
 } from "@ant-design/icons";
-import { Layout, Menu, Spin, Typography } from "antd";
+import { Layout, Menu, Segmented, Spin, Typography } from "antd";
 import { BrowserRouter, Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
+
+import { useLocale } from "../i18n/LocaleProvider";
 
 const DashboardPage = lazy(() => import("../pages/DashboardPage").then((module) => ({ default: module.DashboardPage })));
 const UploadsPage = lazy(() => import("../pages/UploadsPage").then((module) => ({ default: module.UploadsPage })));
@@ -27,39 +29,56 @@ const TagsPage = lazy(() => import("../pages/TagsPage").then((module) => ({ defa
 const { Sider, Header, Content } = Layout;
 const { Title, Paragraph } = Typography;
 
-const menuItems = [
-  { key: "/dashboard", icon: <HomeOutlined />, label: "Overview" },
-  { key: "/uploads", icon: <FileSearchOutlined />, label: "Reports" },
-  { key: "/shops", icon: <ShopOutlined />, label: "Shops" },
-  { key: "/seller-skus", icon: <TagsOutlined />, label: "sellerSKU" },
-  { key: "/analysis", icon: <BarChartOutlined />, label: "Analysis" },
-  { key: "/tags", icon: <TagsOutlined />, label: "Tags" },
-  { key: "/providers", icon: <SettingOutlined />, label: "AI Providers" },
-  { key: "/lingxing", icon: <CloudServerOutlined />, label: "Lingxing" },
-  { key: "/exports", icon: <FileSearchOutlined />, label: "Exports" },
-  { key: "/docs", icon: <BookOutlined />, label: "Docs" },
-];
-
 function ShellLayout() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { locale, setLocale, t } = useLocale();
+
+  const menuItems = [
+    { key: "/dashboard", icon: <HomeOutlined />, label: t("menu.overview") },
+    { key: "/uploads", icon: <FileSearchOutlined />, label: t("menu.reports") },
+    { key: "/shops", icon: <ShopOutlined />, label: t("menu.shops") },
+    { key: "/seller-skus", icon: <TagsOutlined />, label: t("menu.sellerSku") },
+    { key: "/analysis", icon: <BarChartOutlined />, label: t("menu.analysis") },
+    { key: "/tags", icon: <TagsOutlined />, label: t("menu.tags") },
+    { key: "/providers", icon: <SettingOutlined />, label: t("menu.providers") },
+    { key: "/lingxing", icon: <CloudServerOutlined />, label: t("menu.lingxing") },
+    { key: "/exports", icon: <FileSearchOutlined />, label: t("menu.exports") },
+    { key: "/docs", icon: <BookOutlined />, label: t("menu.docs") },
+  ];
 
   return (
     <Layout style={{ minHeight: "100vh", background: "linear-gradient(180deg, #f6f0e8 0%, #eef2e8 100%)" }}>
       <Sider theme="light" width={240} style={{ borderRight: "1px solid rgba(30, 60, 30, 0.08)" }}>
         <div style={{ padding: 24 }}>
           <Title level={4} style={{ margin: 0 }}>
-            Amazon Ad Workbench
+            {t("app.name")}
           </Title>
-          <Paragraph style={{ marginTop: 8, marginBottom: 0 }}>sellerSKU-first</Paragraph>
+          <Paragraph style={{ marginTop: 8, marginBottom: 0 }}>{t("app.tagline")}</Paragraph>
         </div>
         <Menu mode="inline" selectedKeys={[location.pathname]} items={menuItems} onClick={({ key }) => navigate(key)} />
       </Sider>
       <Layout>
-        <Header style={{ background: "transparent", padding: "20px 32px 0" }}>
+        <Header
+          style={{
+            background: "transparent",
+            padding: "20px 32px 0",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
           <Title level={3} style={{ margin: 0 }}>
-            Amazon Advertising Analysis Workbench
+            {t("app.title")}
           </Title>
+          <Segmented
+            value={locale}
+            onChange={(value) => setLocale(value as "en" | "zh")}
+            options={[
+              { label: "EN", value: "en" },
+              { label: "中文", value: "zh" },
+            ]}
+          />
         </Header>
         <Content style={{ padding: 32 }}>
           <Suspense

@@ -4,8 +4,8 @@ from sqlalchemy.orm import Session
 
 from app.api.deps import get_db
 from app.models.provider_config import ProviderConfig
-from app.schemas.provider import ProviderConfigCreate, ProviderTestRequest
-from app.services.provider_service import DEFAULT_PROVIDERS, test_provider, upsert_provider_config
+from app.schemas.provider import ProviderConfigCreate, ProviderModelsResponse, ProviderTestRequest
+from app.services.provider_service import DEFAULT_PROVIDERS, list_provider_models, test_provider, upsert_provider_config
 
 
 router = APIRouter()
@@ -45,3 +45,8 @@ def save_provider_config(payload: ProviderConfigCreate, db: Session = Depends(ge
         enabled=payload.enabled,
     )
     return {"id": config.id, "provider": config.provider, "enabled": config.enabled}
+
+
+@router.get("/models", response_model=ProviderModelsResponse)
+def provider_models(provider: str, db: Session = Depends(get_db)) -> dict:
+    return list_provider_models(db, provider)
