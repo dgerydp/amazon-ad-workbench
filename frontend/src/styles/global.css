@@ -1,0 +1,19 @@
+:root {
+  color: #1f2a1f;
+  background: #f5f1e8;
+  font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+body {
+  margin: 0;
+  color: #1f2a1f;
+  background: #f5f1e8;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  color: inherit;
+}
