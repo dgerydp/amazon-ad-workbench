@@ -179,7 +179,7 @@ docker compose up --build
 
 Services:
 
-- frontend: `http://127.0.0.1:3000`
+- frontend: `http://127.0.0.1:5173`
 - backend: `http://127.0.0.1:8080`
 - postgres: `localhost:5432`
 - redis: `localhost:6379`
