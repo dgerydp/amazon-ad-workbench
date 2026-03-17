@@ -1,11 +1,12 @@
 import { http } from "./http";
 import type {
   AnalysisJobResult,
-  DemoBootstrapResult,
+  CombinationRule,
   OverviewStats,
+  PerformanceRule,
   ProviderConfigResponse,
   ReportBatch,
-  SellerSku,
+  RuleGroup,
   Shop,
 } from "../types/api";
 
@@ -18,14 +19,10 @@ export const api = {
   getTagSummary: async () => (await http.get("/insights/tag-summary")).data,
 
   listShops: async () => (await http.get<Shop[]>("/shops")).data,
-  createShop: async (payload: Partial<Shop>) => (await http.post<Shop>("/shops", payload)).data,
-
-  listSellerSkus: async (shopId?: number) =>
-    (await http.get<SellerSku[]>("/seller-skus", { params: shopId ? { shop_id: shopId } : {} })).data,
-  createSellerSku: async (payload: Partial<SellerSku>) =>
-    (await http.post<SellerSku>("/seller-skus", payload)).data,
 
   listBatches: async () => (await http.get<ReportBatch[]>("/report-batches")).data,
+  deleteBatch: async (batchId: number) => (await http.delete(`/report-batches/${batchId}`)).data,
+  clearBatches: async () => (await http.delete("/report-batches")).data,
   uploadSearchTerms: async (file: File, shopId?: number | null) => {
     const formData = new FormData();
     formData.append("file", file);
@@ -42,12 +39,25 @@ export const api = {
     }
     return (await http.post<ReportBatch>("/report-batches/advertised-products/upload", formData)).data;
   },
-  bootstrapDemo: async (payload?: { reset?: boolean; use_ai?: boolean; provider?: string; model?: string }) =>
-    (await http.post<DemoBootstrapResult>("/demo/bootstrap", payload ?? {})).data,
 
   runAnalysis: async (payload: { shop_id?: number; batch_id?: number; use_ai?: boolean; provider?: string; model?: string }) =>
     (await http.post<AnalysisJobResult>("/analysis/run", payload)).data,
   listAnalysisJobs: async () => (await http.get("/analysis/jobs")).data,
+
+  getRuleGroups: async () => (await http.get<{ field_options: Array<{ value: string; label: string }>; groups: RuleGroup[] }>("/rules/groups")).data,
+  updateRuleGroup: async (groupId: number, payload: { description?: string | null; is_active: boolean; priority: number }) =>
+    (await http.put<RuleGroup>(`/rules/groups/${groupId}`, payload)).data,
+  createRule: async (payload: PerformanceRule & { group_id: number }) =>
+    (await http.post<PerformanceRule>("/rules/rules", payload)).data,
+  updateRule: async (ruleId: number, payload: PerformanceRule) =>
+    (await http.put<PerformanceRule>(`/rules/rules/${ruleId}`, payload)).data,
+  deleteRule: async (ruleId: number) => (await http.delete(`/rules/rules/${ruleId}`)).data,
+  getCombinationRules: async () => (await http.get<{ rules: CombinationRule[] }>("/rules/combinations")).data,
+  createCombinationRule: async (payload: CombinationRule) =>
+    (await http.post<CombinationRule>("/rules/combinations", payload)).data,
+  updateCombinationRule: async (ruleId: number, payload: CombinationRule) =>
+    (await http.put<CombinationRule>(`/rules/combinations/${ruleId}`, payload)).data,
+  deleteCombinationRule: async (ruleId: number) => (await http.delete(`/rules/combinations/${ruleId}`)).data,
 
   listProviders: async () => (await http.get("/providers")).data,
   testProvider: async (payload: { provider: string; api_key?: string; base_url?: string; model?: string }) =>

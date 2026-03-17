@@ -35,8 +35,9 @@ If you want to try the project with the least amount of setup:
 1. Start the backend.
 2. Start the frontend.
 3. Open the app.
-4. Click `Load Demo Data`.
-5. Review `Reports`, `Analysis`, `Tags`, and `Exports`.
+4. Upload a `Search Term Report`.
+5. Upload an `Advertised Product Report`.
+6. Review `Reports`, `Analysis`, `Tags`, and `Exports`.
 
 You do not need:
 
@@ -65,8 +66,6 @@ Implemented:
 - SQLite default local startup
 - optional PostgreSQL via Docker Compose
 - report upload
-- demo data bootstrap
-- sellerSKU management
 - rule engine
 - AI provider configuration
 - Lingxing connection test and basic sync
@@ -134,7 +133,7 @@ npm install
 npm run dev
 ```
 
-Then open the frontend and click `Load Demo Data`.
+Then open the frontend, upload your reports, and run analysis.
 
 ### Option 2: PowerShell helpers
 
@@ -187,16 +186,15 @@ Services:
 ## First-Time User Flow
 
 1. Open the dashboard.
-2. Click `Load Demo Data` to bootstrap a demo shop, sample sellerSKU records, sample reports, and a completed analysis job.
-3. Review:
+2. Upload:
+   - `Search Term Report`
+   - `Advertised Product Report`
+3. Run analysis and review:
    - `Reports`
    - `Analysis`
    - `Tags`
    - `Exports`
-4. If you want to use real data, upload:
-   - `Search Term Report`
-   - `Advertised Product Report`
-5. Optionally configure:
+4. Optionally configure:
    - AI provider key
    - Lingxing connector
 
@@ -225,7 +223,6 @@ examples/  sample input reports
 
 ## Key Backend Endpoints
 
-- `POST /api/demo/bootstrap`
 - `POST /api/report-batches/search-terms/upload`
 - `POST /api/report-batches/advertised-products/upload`
 - `POST /api/analysis/run`
@@ -275,6 +272,25 @@ npm run build
 - Do not commit real API keys.
 - Do not introduce internal SKU mapping logic into this repo.
 - Keep the product usable without AI and without Lingxing.
+
+## Data Safety
+
+This repository is intended to stay safe for public open-source use.
+
+- Keep real ad reports, local databases, and `.env` files out of git.
+- Use the sample files in `examples/` for demos, screenshots, and bug reports.
+- If you discover sensitive data committed by mistake, follow [SECURITY.md](./SECURITY.md).
+
+## Support The Project
+
+If this repository helps you, there are a few high-signal ways to support it:
+
+- star the repository
+- open issues with reproducible examples
+- send focused pull requests with tests or docs updates
+- sponsor the maintainer through GitHub Sponsors if the button is available on the repo
+
+The repository includes [`.github/FUNDING.yml`](./.github/FUNDING.yml), so GitHub can show a sponsor entry point when the maintainer account has funding enabled.
 
 ## License
 

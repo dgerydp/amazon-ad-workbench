@@ -1,5 +1,6 @@
 from app.models.advertised_product import AdvertisedProduct
 from app.models.analysis_job import AnalysisJob
+from app.models.performance_rule import CombinationRule, PerformanceRule, PerformanceRuleGroup, PerformanceRuleHit
 from app.models.provider_config import ProviderConfig
 from app.models.report_batch import ReportBatch
 from app.models.rule import RuleHit, RuleItem, RuleSet
@@ -19,6 +20,10 @@ all_models = [
     SearchTermLink,
     SearchTermToken,
     SemanticTag,
+    PerformanceRuleGroup,
+    PerformanceRule,
+    CombinationRule,
+    PerformanceRuleHit,
     RuleSet,
     RuleItem,
     RuleHit,

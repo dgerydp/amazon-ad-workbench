@@ -25,3 +25,5 @@ tmp/
 coverage/
 *.db
 .pytest_cache/
+/商品推广_*.xlsx
+/商品推广_*.csv

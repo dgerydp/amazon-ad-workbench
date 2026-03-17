@@ -57,11 +57,47 @@ export interface ProviderConfigResponse {
   enabled: boolean;
 }
 
-export interface DemoBootstrapResult {
-  ok: boolean;
-  shop_id: number;
-  shop_name: string;
-  analysis_job_id: number;
-  analysis_status: string;
-  analysis_result?: Record<string, unknown> | null;
+export interface RuleCondition {
+  field: string;
+  op: string;
+  value: number;
+}
+
+export interface PerformanceRule {
+  id?: number;
+  group_id?: number;
+  name: string;
+  icon?: string | null;
+  color?: string | null;
+  priority: number;
+  conditions: RuleCondition[];
+  description?: string | null;
+  action_advice?: string | null;
+  is_active: boolean;
+}
+
+export interface RuleGroup {
+  id: number;
+  name: string;
+  description?: string | null;
+  is_active: boolean;
+  priority: number;
+  rules: PerformanceRule[];
+}
+
+export interface CombinationTagCondition {
+  group_name: string;
+  tags: string[];
+}
+
+export interface CombinationRule {
+  id?: number;
+  name: string;
+  icon?: string | null;
+  color?: string | null;
+  priority: number;
+  description?: string | null;
+  action_advice?: string | null;
+  is_active: boolean;
+  tag_conditions: CombinationTagCondition[];
 }

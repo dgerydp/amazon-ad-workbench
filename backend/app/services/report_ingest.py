@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 from app.models.advertised_product import AdvertisedProduct
 from app.models.report_batch import ReportBatch
 from app.models.search_term_report import SearchTermReport
-from app.services.report_parser import load_dataframe, normalize_columns, parse_int, parse_number
+from app.services.report_parser import load_dataframe, normalize_columns, normalize_date_value, parse_int, parse_number
 
 
 def persist_batch_rows(
@@ -41,7 +41,7 @@ def persist_batch_rows(
     )
 
     for _, row in df.iterrows():
-        date_value = str(row.get("date", "")).strip()
+        date_value = normalize_date_value(row.get("date"))
         if not date_value:
             continue
         dates.append(date_value)

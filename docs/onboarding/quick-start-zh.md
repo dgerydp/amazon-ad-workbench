@@ -18,8 +18,9 @@ cd amazon-ad-workbench
 1. 启动后端
 2. 启动前端
 3. 打开页面
-4. 点击 `Load Demo Data`
-5. 依次查看：
+4. 上传 `Search Term Report`
+5. 上传 `Advertised Product Report`
+6. 依次查看：
    - `Reports`
    - `Analysis`
    - `Tags`
@@ -120,19 +121,17 @@ npm run dev
 ### 体验模式
 
 1. 打开首页 `Overview`
-2. 点击 `Load Demo Data`
-3. 系统自动导入：
-   - 示例店铺
-   - 示例 sellerSKU
-   - 示例广告报表
-   - 一次完整分析结果
-4. 再按顺序查看：
+2. 打开 `Reports`
+3. 上传搜索词报表
+4. 上传投放商品报表
+5. 打开 `Analysis` 运行分析
+6. 再按顺序查看：
    - `Reports`
    - `Analysis`
    - `Tags`
    - `Exports`
 
-这是最快看懂项目的方式，不需要任何外部账号。
+这是当前最快看懂项目的方式，不需要先配置 AI 或领星。
 
 ## 真实数据怎么用
 
@@ -167,12 +166,12 @@ npm run dev
 
 要启用 AI，按这个顺序做：
 
-1. 打开 `AI Providers`
+1. 打开 `AI 配置`
 2. 选择一个模型提供商
 3. 填写 `API Key`
 4. 可选填写 `Base URL` 和 `Model`
-5. 先点 `Test`
-6. 再回到 `Analysis` 勾选 `Enable AI Tagging`
+5. 先点 `测试`
+6. 再回到 `Analysis` 勾选 `启用 AI 打标`
 
 当前支持：
 

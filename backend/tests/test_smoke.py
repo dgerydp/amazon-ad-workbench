@@ -53,11 +53,15 @@ def test_full_smoke_flow():
         assert export.status_code == 200
         assert export.headers["content-disposition"].startswith('attachment; filename="full-analysis.xlsx"')
 
-
-def test_demo_bootstrap():
+def test_health_and_rules_available():
     with TestClient(app) as client:
-        response = client.post("/api/demo/bootstrap", json={"reset": True, "use_ai": False})
-        assert response.status_code == 200
-        payload = response.json()
-        assert payload["ok"] is True
-        assert payload["analysis_status"] == "completed"
+        health = client.get("/health")
+        assert health.status_code == 200
+        assert health.json()["status"] == "ok"
+
+        rules = client.get("/api/rules/groups")
+        assert rules.status_code == 200
+        payload = rules.json()
+        assert isinstance(payload.get("field_options"), list)
+        assert isinstance(payload.get("groups"), list)
+        assert len(payload["groups"]) >= 1

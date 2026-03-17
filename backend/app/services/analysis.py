@@ -8,37 +8,29 @@ from sqlalchemy.orm import Session
 
 from app.models.advertised_product import AdvertisedProduct
 from app.models.analysis_job import AnalysisJob
-from app.models.rule import RuleHit, RuleItem, RuleSet
 from app.models.search_term_link import SearchTermLink
 from app.models.search_term_report import SearchTermReport
 from app.models.search_term_token import SearchTermToken
-from app.rules.builtin import BUILTIN_RULESET_NAME, BUILTIN_RULES
-from app.rules.evaluator import evaluate_rule
 from app.services.llm_tagging import tag_tokens
+from app.services.rule_engine import run_performance_rules
 
 
 STOP_WORDS = {"a", "an", "and", "the", "of", "for", "with", "to", "in", "on", "by"}
+SQLITE_CHUNK_SIZE = 800
 
 
-def ensure_builtin_rules(db: Session) -> RuleSet:
-    ruleset = db.scalar(select(RuleSet).where(RuleSet.name == BUILTIN_RULESET_NAME))
-    if ruleset:
-        return ruleset
-
-    ruleset = RuleSet(name=BUILTIN_RULESET_NAME, is_builtin=True, is_active=True)
-    db.add(ruleset)
-    db.flush()
-    for rule in BUILTIN_RULES:
-        db.add(RuleItem(rule_set_id=ruleset.id, **rule))
-    db.commit()
-    db.refresh(ruleset)
-    return ruleset
+def _iter_chunks(ids: list[int], chunk_size: int = SQLITE_CHUNK_SIZE) -> list[list[int]]:
+    chunks: list[list[int]] = []
+    for start in range(0, len(ids), chunk_size):
+        chunks.append(ids[start : start + chunk_size])
+    return chunks
 
 
-def _acos(spend: float, sales: float) -> float:
-    if not sales:
-        return 999 if spend else 0
-    return round(spend / sales, 4)
+def _delete_in_chunks(db: Session, model, column, ids: list[int]) -> None:
+    if not ids:
+        return
+    for chunk in _iter_chunks(ids):
+        db.execute(delete(model).where(column.in_(chunk)))
 
 
 def tokenize(search_term: str) -> list[str]:
@@ -68,38 +60,30 @@ def link_search_terms(db: Session, shop_id: int | None = None) -> dict[str, int]
     reports = db.scalars(query).all()
     sku_map = build_seller_sku_map(db, shop_id)
 
-    if reports:
-        db.execute(delete(SearchTermLink).where(SearchTermLink.search_term_report_id.in_([report.id for report in reports])))
+    report_ids = [report.id for report in reports]
+    if report_ids:
+        _delete_in_chunks(db, SearchTermLink, SearchTermLink.search_term_report_id, report_ids)
 
-    linked = 0
-    ambiguous = 0
+    linked_rows = 0
+    expanded_reports = 0
     unlinked = 0
 
     for report in reports:
         candidates = sku_map.get((report.shop_id, report.campaign_name, report.ad_group_name, report.date), [])
-        if len(candidates) == 1:
-            candidate = candidates[0]
-            db.add(
-                SearchTermLink(
-                    search_term_report_id=report.id,
-                    seller_sku=candidate.seller_sku,
-                    asin=candidate.asin,
-                    link_method="unique_ad_group_match",
-                    confidence=1,
+        if candidates:
+            if len(candidates) > 1:
+                expanded_reports += 1
+            for candidate in candidates:
+                db.add(
+                    SearchTermLink(
+                        search_term_report_id=report.id,
+                        seller_sku=candidate.seller_sku,
+                        asin=candidate.asin,
+                        link_method="ad_group_product_expand" if len(candidates) > 1 else "unique_ad_group_match",
+                        confidence=1 if len(candidates) == 1 else 0.8,
+                    )
                 )
-            )
-            linked += 1
-        elif len(candidates) > 1:
-            db.add(
-                SearchTermLink(
-                    search_term_report_id=report.id,
-                    seller_sku=None,
-                    asin=None,
-                    link_method="ambiguous_ad_group_match",
-                    confidence=0,
-                )
-            )
-            ambiguous += 1
+                linked_rows += 1
         else:
             db.add(
                 SearchTermLink(
@@ -113,7 +97,7 @@ def link_search_terms(db: Session, shop_id: int | None = None) -> dict[str, int]
             unlinked += 1
 
     db.commit()
-    return {"linked": linked, "ambiguous": ambiguous, "unlinked": unlinked}
+    return {"linked_rows": linked_rows, "expanded_reports": expanded_reports, "unlinked": unlinked}
 
 
 def build_tokens(db: Session, shop_id: int | None = None) -> dict[str, int]:
@@ -122,83 +106,43 @@ def build_tokens(db: Session, shop_id: int | None = None) -> dict[str, int]:
         query = query.where(SearchTermReport.shop_id == shop_id)
     reports = db.scalars(query).all()
 
-    if reports:
-        db.execute(delete(SearchTermToken).where(SearchTermToken.search_term_report_id.in_([report.id for report in reports])))
+    report_ids = [report.id for report in reports]
+    if report_ids:
+        _delete_in_chunks(db, SearchTermToken, SearchTermToken.search_term_report_id, report_ids)
 
-    link_query = select(SearchTermLink)
-    if reports:
-        link_query = link_query.where(SearchTermLink.search_term_report_id.in_([report.id for report in reports]))
-    links = db.scalars(link_query).all()
-    link_map = {link.search_term_report_id: link for link in links}
+    links: list[SearchTermLink] = []
+    if report_ids:
+        for chunk in _iter_chunks(report_ids):
+            links.extend(
+                db.scalars(select(SearchTermLink).where(SearchTermLink.search_term_report_id.in_(chunk))).all()
+            )
+    link_map: dict[int, list[SearchTermLink]] = defaultdict(list)
+    for link in links:
+        link_map[link.search_term_report_id].append(link)
 
     created = 0
     for report in reports:
-        link = link_map.get(report.id)
-        for token in tokenize(report.search_term):
-            db.add(
-                SearchTermToken(
-                    search_term_report_id=report.id,
-                    shop_id=report.shop_id,
-                    seller_sku=link.seller_sku if link else None,
-                    token=token,
-                    token_normalized=token,
-                    impressions=report.impressions,
-                    clicks=report.clicks,
-                    spend=report.spend,
-                    sales=report.sales,
-                    orders=report.orders,
-                )
-            )
-            created += 1
-    db.commit()
-    return {"tokens_created": created}
-
-
-def run_rules(db: Session, shop_id: int | None = None) -> dict[str, int]:
-    ruleset = ensure_builtin_rules(db)
-    rules = db.scalars(
-        select(RuleItem).where(RuleItem.rule_set_id == ruleset.id).order_by(RuleItem.priority.asc(), RuleItem.id.asc())
-    ).all()
-    query = select(SearchTermToken)
-    if shop_id is not None:
-        query = query.where(SearchTermToken.shop_id == shop_id)
-    tokens = db.scalars(query).all()
-
-    if tokens:
-        db.execute(
-            delete(RuleHit).where(
-                RuleHit.target_type == "search_term_token",
-                RuleHit.target_id.in_([token.id for token in tokens]),
-            )
-        )
-
-    hit_count = 0
-    for token in tokens:
-        record = {
-            "clicks": token.clicks,
-            "orders": token.orders,
-            "spend": token.spend,
-            "sales": token.sales,
-            "acos": _acos(token.spend, token.sales),
-        }
-        for rule in rules:
-            if evaluate_rule(record, rule.conditions_json):
-                token.action_label = rule.action_type
+        report_links = link_map.get(report.id) or [None]
+        tokens = tokenize(report.search_term)
+        for token in tokens:
+            for link in report_links:
                 db.add(
-                    RuleHit(
-                        target_type="search_term_token",
-                        target_id=token.id,
-                        rule_item_id=rule.id,
-                        hit_payload=record,
+                    SearchTermToken(
+                        search_term_report_id=report.id,
+                        shop_id=report.shop_id,
+                        seller_sku=link.seller_sku if link else None,
+                        token=token,
+                        token_normalized=token,
+                        impressions=report.impressions,
+                        clicks=report.clicks,
+                        spend=report.spend,
+                        sales=report.sales,
+                        orders=report.orders,
                     )
                 )
-                hit_count += 1
-                break
-        else:
-            token.action_label = "none"
-
+                created += 1
     db.commit()
-    return {"rule_hits": hit_count}
+    return {"tokens_created": created}
 
 
 def run_full_analysis(
@@ -222,7 +166,7 @@ def run_full_analysis(
         link_result = link_search_terms(db, shop_id=shop_id)
         token_result = build_tokens(db, shop_id=shop_id)
         tag_result = tag_tokens(db, shop_id=shop_id, use_ai=use_ai, provider=provider, model=model)
-        rule_result = run_rules(db, shop_id=shop_id)
+        rule_result = run_performance_rules(db, shop_id=shop_id)
         job.status = "completed"
         job.result = {
             "linking": link_result,

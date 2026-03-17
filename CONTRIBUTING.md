@@ -31,3 +31,4 @@
 - Update docs when behavior changes.
 - Add or update tests when you touch ingestion, analysis, connectors, or exports.
 - If you change provider behavior, include failure handling and a non-AI fallback path.
+- Check `git status` before pushing so local reports, databases, and `.env` files stay out of the PR.

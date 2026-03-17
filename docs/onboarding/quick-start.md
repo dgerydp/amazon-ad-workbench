@@ -18,8 +18,9 @@ The simplest path is:
 1. start the backend
 2. start the frontend
 3. open the app
-4. click `Load Demo Data`
-5. review `Reports`, `Analysis`, `Tags`, and `Exports`
+4. upload a `Search Term Report`
+5. upload an `Advertised Product Report`
+6. review `Reports`, `Analysis`, `Tags`, and `Exports`
 
 You do not need:
 

@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Button, Card, Form, Input, Result, Space, Typography, message } from "antd";
+import { Alert, Button, Card, Form, Input, Result, Space, Typography, message } from "antd";
 
 import { api } from "../services/api";
 
-const { Title, Paragraph } = Typography;
+const { Paragraph, Title } = Typography;
 
 export function LingxingPage() {
   const [form] = Form.useForm();
@@ -15,31 +15,35 @@ export function LingxingPage() {
 
   const syncShops = useMutation({
     mutationFn: api.syncLingxingShops,
-    onSuccess: (data) => {
-      message.success(`Synced shops: ${data.synced_shops ?? 0}`);
-      queryClient.invalidateQueries({ queryKey: ["shops"] });
+    onSuccess: async (data) => {
+      message.success(`已同步店铺：${data.synced_shops ?? 0}`);
+      await queryClient.invalidateQueries({ queryKey: ["shops"] });
     },
   });
 
   const syncSellerSkus = useMutation({
-    mutationFn: (payload: { app_id?: string; app_secret?: string; base_url?: string }) =>
-      api.syncLingxingSellerSkus(payload),
-    onSuccess: (data) => {
-      message.success(`Synced sellerSKU rows: ${data.synced_seller_skus ?? 0}`);
-      queryClient.invalidateQueries({ queryKey: ["seller-skus"] });
+    mutationFn: (payload: { app_id?: string; app_secret?: string; base_url?: string }) => api.syncLingxingSellerSkus(payload),
+    onSuccess: async (data) => {
+      message.success(`已同步 sellerSKU：${data.synced_seller_skus ?? 0}`);
+      await queryClient.invalidateQueries({ queryKey: ["seller-skus"] });
     },
   });
 
   return (
     <Space direction="vertical" size={24} style={{ display: "flex" }}>
       <div>
-        <Title level={2}>Lingxing</Title>
-        <Paragraph>
-          The project does not depend on Lingxing, but you can connect it to sync shops and sellerSKU base data for richer
-          analysis output.
-        </Paragraph>
+        <Title level={2}>领星同步</Title>
+        <Paragraph>领星接入是可选能力。只有在你想同步店铺和 sellerSKU 基础资料时才需要这里，报表上传和分析本身并不依赖领星。</Paragraph>
       </div>
-      <Card style={{ borderRadius: 16 }}>
+
+      <Alert
+        type="info"
+        showIcon
+        message="建议"
+        description="先把报表分析主流程跑通，再接领星。这样能把“数据同步问题”和“分析规则问题”拆开处理。"
+      />
+
+      <Card style={{ borderRadius: 18 }}>
         <Form form={form} layout="vertical" onFinish={(values) => mutation.mutate(values)}>
           <Form.Item name="app_id" label="App ID">
             <Input />
@@ -52,13 +56,13 @@ export function LingxingPage() {
           </Form.Item>
           <Space wrap>
             <Button type="primary" htmlType="submit" loading={mutation.isPending}>
-              Test Connection
+              测试连接
             </Button>
             <Button onClick={() => syncShops.mutate(form.getFieldsValue())} loading={syncShops.isPending}>
-              Sync Shops
+              同步店铺
             </Button>
             <Button onClick={() => syncSellerSkus.mutate(form.getFieldsValue())} loading={syncSellerSkus.isPending}>
-              Sync sellerSKU
+              同步 sellerSKU
             </Button>
           </Space>
         </Form>
@@ -67,7 +71,7 @@ export function LingxingPage() {
       {mutation.data ? (
         <Result
           status={mutation.data.ok ? "success" : "warning"}
-          title={mutation.data.ok ? "Connection test passed" : "Connection test failed"}
+          title={mutation.data.ok ? "连接测试通过" : "连接测试失败"}
           subTitle={mutation.data.message}
         />
       ) : null}

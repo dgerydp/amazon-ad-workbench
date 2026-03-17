@@ -2,42 +2,38 @@ import { Suspense, lazy } from "react";
 
 import {
   BarChartOutlined,
-  BookOutlined,
   CloudServerOutlined,
-  FileSearchOutlined,
+  ControlOutlined,
+  ExportOutlined,
   HomeOutlined,
   SettingOutlined,
-  ShopOutlined,
   TagsOutlined,
+  UploadOutlined,
 } from "@ant-design/icons";
 import { Layout, Menu, Spin, Typography } from "antd";
 import { BrowserRouter, Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 
 const DashboardPage = lazy(() => import("../pages/DashboardPage").then((module) => ({ default: module.DashboardPage })));
 const UploadsPage = lazy(() => import("../pages/UploadsPage").then((module) => ({ default: module.UploadsPage })));
-const ShopsPage = lazy(() => import("../pages/ShopsPage").then((module) => ({ default: module.ShopsPage })));
-const SellerSkusPage = lazy(() => import("../pages/SellerSkusPage").then((module) => ({ default: module.SellerSkusPage })));
 const AnalysisPage = lazy(() => import("../pages/AnalysisPage").then((module) => ({ default: module.AnalysisPage })));
+const RulesPage = lazy(() => import("../pages/RulesPage").then((module) => ({ default: module.RulesPage })));
+const TagsPage = lazy(() => import("../pages/TagsPage").then((module) => ({ default: module.TagsPage })));
 const ProvidersPage = lazy(() => import("../pages/ProvidersPage").then((module) => ({ default: module.ProvidersPage })));
 const LingxingPage = lazy(() => import("../pages/LingxingPage").then((module) => ({ default: module.LingxingPage })));
 const ExportsPage = lazy(() => import("../pages/ExportsPage").then((module) => ({ default: module.ExportsPage })));
-const DocsPage = lazy(() => import("../pages/DocsPage").then((module) => ({ default: module.DocsPage })));
-const TagsPage = lazy(() => import("../pages/TagsPage").then((module) => ({ default: module.TagsPage })));
 
-const { Sider, Header, Content } = Layout;
-const { Title, Paragraph } = Typography;
+const { Content, Header, Sider } = Layout;
+const { Title } = Typography;
 
 const menuItems = [
-  { key: "/dashboard", icon: <HomeOutlined />, label: "Overview" },
-  { key: "/uploads", icon: <FileSearchOutlined />, label: "Reports" },
-  { key: "/shops", icon: <ShopOutlined />, label: "Shops" },
-  { key: "/seller-skus", icon: <TagsOutlined />, label: "sellerSKU" },
-  { key: "/analysis", icon: <BarChartOutlined />, label: "Analysis" },
-  { key: "/tags", icon: <TagsOutlined />, label: "Tags" },
-  { key: "/providers", icon: <SettingOutlined />, label: "AI Providers" },
-  { key: "/lingxing", icon: <CloudServerOutlined />, label: "Lingxing" },
-  { key: "/exports", icon: <FileSearchOutlined />, label: "Exports" },
-  { key: "/docs", icon: <BookOutlined />, label: "Docs" },
+  { key: "/dashboard", icon: <HomeOutlined />, label: "概览" },
+  { key: "/uploads", icon: <UploadOutlined />, label: "报表上传" },
+  { key: "/analysis", icon: <BarChartOutlined />, label: "分析" },
+  { key: "/rules", icon: <ControlOutlined />, label: "规则配置" },
+  { key: "/tags", icon: <TagsOutlined />, label: "标签" },
+  { key: "/providers", icon: <SettingOutlined />, label: "AI 配置" },
+  { key: "/lingxing", icon: <CloudServerOutlined />, label: "领星同步" },
+  { key: "/exports", icon: <ExportOutlined />, label: "导出" },
 ];
 
 function ShellLayout() {
@@ -45,26 +41,34 @@ function ShellLayout() {
   const location = useLocation();
 
   return (
-    <Layout style={{ minHeight: "100vh", background: "linear-gradient(180deg, #f6f0e8 0%, #eef2e8 100%)" }}>
-      <Sider theme="light" width={240} style={{ borderRight: "1px solid rgba(30, 60, 30, 0.08)" }}>
-        <div style={{ padding: 24 }}>
-          <Title level={4} style={{ margin: 0 }}>
-            Amazon Ad Workbench
+    <Layout className="app-shell">
+      <Sider className="app-sider" theme="light" width={280}>
+        <div className="app-brand">
+          <div className="app-brand-mark">SIGNAL LAB</div>
+          <Title level={4} className="app-brand-title">
+            亚马逊广告信号台
           </Title>
-          <Paragraph style={{ marginTop: 8, marginBottom: 0 }}>sellerSKU-first</Paragraph>
         </div>
-        <Menu mode="inline" selectedKeys={[location.pathname]} items={menuItems} onClick={({ key }) => navigate(key)} />
+        <Menu
+          className="app-menu"
+          mode="inline"
+          selectedKeys={[location.pathname]}
+          items={menuItems}
+          onClick={({ key }) => navigate(key)}
+        />
       </Sider>
-      <Layout>
-        <Header style={{ background: "transparent", padding: "20px 32px 0" }}>
-          <Title level={3} style={{ margin: 0 }}>
-            Amazon Advertising Analysis Workbench
-          </Title>
+      <Layout className="app-main">
+        <Header className="app-header">
+          <div className="app-header-panel">
+            <Title level={2} className="app-header-title">
+              广告词信号分析台
+            </Title>
+          </div>
         </Header>
-        <Content style={{ padding: 32 }}>
+        <Content className="app-content">
           <Suspense
             fallback={
-              <div style={{ minHeight: 240, display: "grid", placeItems: "center" }}>
+              <div className="page-loading">
                 <Spin size="large" />
               </div>
             }
@@ -73,14 +77,12 @@ function ShellLayout() {
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/uploads" element={<UploadsPage />} />
-              <Route path="/shops" element={<ShopsPage />} />
-              <Route path="/seller-skus" element={<SellerSkusPage />} />
               <Route path="/analysis" element={<AnalysisPage />} />
+              <Route path="/rules" element={<RulesPage />} />
               <Route path="/tags" element={<TagsPage />} />
               <Route path="/providers" element={<ProvidersPage />} />
               <Route path="/lingxing" element={<LingxingPage />} />
               <Route path="/exports" element={<ExportsPage />} />
-              <Route path="/docs" element={<DocsPage />} />
             </Routes>
           </Suspense>
         </Content>
