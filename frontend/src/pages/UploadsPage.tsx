@@ -1,3 +1,10 @@
+import {
+  ClearOutlined,
+  DatabaseOutlined,
+  FolderOpenOutlined,
+  ShopOutlined,
+  UploadOutlined,
+} from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Alert, Button, Card, Form, Popconfirm, Select, Space, Table, Typography, Upload, message } from "antd";
 import type { UploadFile } from "antd/es/upload/interface";
@@ -22,6 +29,10 @@ export function UploadsPage() {
   const queryClient = useQueryClient();
   const shops = useQuery({ queryKey: ["shops"], queryFn: api.listShops });
   const batches = useQuery({ queryKey: ["batches"], queryFn: api.listBatches });
+
+  const batchRows = batches.data ?? [];
+  const processingCount = batchRows.filter((item) => item.status === "processing").length;
+  const totalRows = batchRows.reduce((sum, item) => sum + Number(item.row_count ?? 0), 0);
 
   const refreshAfterBatchChange = async () => {
     await Promise.all([
@@ -90,13 +101,45 @@ export function UploadsPage() {
     };
 
   return (
-    <Space direction="vertical" size={24} style={{ display: "flex" }}>
-      <div>
-        <Title level={2}>报表上传</Title>
-        <Paragraph>
-          上传搜索词报表和投放商品报表后，就可以直接基于报表里的 SKU 做归因。这里也支持删除单个导入批次，或一键清空全部导入数据。
-        </Paragraph>
-      </div>
+    <Space direction="vertical" size={24} style={{ display: "flex" }} className="page-layout">
+      <section className="page-hero">
+        <div className="page-hero-main">
+          <div className="page-kicker">Report Intake</div>
+          <Title className="page-title">先把报表入口整理干净，后面的分析链路才会稳</Title>
+          <Paragraph className="page-summary">
+            上传页负责把搜索词报表和投放商品报表接入系统。这里不做花哨的东西，重点是让导入动作、店铺归属和批次状态一眼可控。
+          </Paragraph>
+          <div className="page-chip-row">
+            <div className="page-chip">搜索词 + 投放商品双报表</div>
+            <div className="page-chip">支持关联店铺</div>
+            <div className="page-chip">可删除单批次或整体重置</div>
+          </div>
+        </div>
+
+        <aside className="page-hero-side">
+          <div className="page-side-kicker">Ingestion Pulse</div>
+          <div className="page-side-value">{batchRows.length}</div>
+          <div className="page-side-copy">当前导入批次数</div>
+          <div className="page-side-grid">
+            <div className="page-side-metric">
+              <span>处理中</span>
+              <strong>{processingCount}</strong>
+            </div>
+            <div className="page-side-metric">
+              <span>累计行数</span>
+              <strong>{totalRows}</strong>
+            </div>
+            <div className="page-side-metric">
+              <span>可选店铺</span>
+              <strong>{shops.data?.length ?? 0}</strong>
+            </div>
+            <div className="page-side-metric">
+              <span>导入类型</span>
+              <strong>2</strong>
+            </div>
+          </div>
+        </aside>
+      </section>
 
       <Alert
         type="info"
@@ -105,45 +148,99 @@ export function UploadsPage() {
         description="1. 上传搜索词报表。2. 上传投放商品报表。3. 去规则页确认规则。4. 回分析页运行分析。如果替换了源数据，建议先删除旧批次或直接清空后重传。"
       />
 
-      <Card style={{ borderRadius: 18 }}>
-        <Form form={form} layout="vertical">
-          <Form.Item name="shop_id" label="关联店铺（可选）">
-            <Select
-              allowClear
-              placeholder="留空时按全局数据导入"
-              options={(shops.data ?? []).map((shop) => ({
-                value: shop.id,
-                label: `${shop.name} / ${shop.marketplace}`,
-              }))}
-            />
-          </Form.Item>
+      <div className="page-dual-grid">
+        <Card title="导入设置" className="page-section-card">
+          <Form form={form} layout="vertical">
+            <Form.Item name="shop_id" label="关联店铺（可选）">
+              <Select
+                allowClear
+                placeholder="留空时按全局数据导入"
+                options={(shops.data ?? []).map((shop) => ({
+                  value: shop.id,
+                  label: `${shop.name} / ${shop.marketplace}`,
+                }))}
+              />
+            </Form.Item>
 
-          <Space wrap>
-            <Upload beforeUpload={beforeUpload("search")} showUploadList={false}>
-              <Button type="primary" loading={searchUpload.isPending}>
-                上传搜索词报表
-              </Button>
-            </Upload>
-            <Upload beforeUpload={beforeUpload("product")} showUploadList={false}>
-              <Button loading={productUpload.isPending}>上传投放商品报表</Button>
-            </Upload>
-            <Popconfirm
-              title="确认清空全部导入数据？"
-              description="会删除所有导入批次、源报表数据以及分析派生结果。"
-              onConfirm={() => clearBatches.mutate()}
-            >
-              <Button danger loading={clearBatches.isPending}>
-                清空全部
-              </Button>
-            </Popconfirm>
-          </Space>
-        </Form>
-      </Card>
+            <div className="page-action-grid">
+              <div className="page-action-card">
+                <div className="page-action-icon">
+                  <FolderOpenOutlined />
+                </div>
+                <div className="page-action-title">搜索词报表</div>
+                <div className="page-action-copy">导入搜索词、点击、订单和销售额等搜索词视角数据。</div>
+                <Upload beforeUpload={beforeUpload("search")} showUploadList={false}>
+                  <Button type="primary" icon={<UploadOutlined />} loading={searchUpload.isPending}>
+                    上传搜索词报表
+                  </Button>
+                </Upload>
+              </div>
 
-      <Card title="导入批次" style={{ borderRadius: 18 }}>
+              <div className="page-action-card">
+                <div className="page-action-icon">
+                  <DatabaseOutlined />
+                </div>
+                <div className="page-action-title">投放商品报表</div>
+                <div className="page-action-copy">补全商品维度数据，用于后续 sellerSKU 归因和聚合统计。</div>
+                <Upload beforeUpload={beforeUpload("product")} showUploadList={false}>
+                  <Button icon={<UploadOutlined />} loading={productUpload.isPending}>
+                    上传投放商品报表
+                  </Button>
+                </Upload>
+              </div>
+
+              <div className="page-action-card">
+                <div className="page-action-icon">
+                  <ClearOutlined />
+                </div>
+                <div className="page-action-title">重置导入区</div>
+                <div className="page-action-copy">当你确认要全量替换源数据时，一次性清空所有批次和派生结果。</div>
+                <Popconfirm
+                  title="确认清空全部导入数据？"
+                  description="会删除所有导入批次、源报表数据以及分析派生结果。"
+                  onConfirm={() => clearBatches.mutate()}
+                >
+                  <Button danger loading={clearBatches.isPending}>
+                    清空全部
+                  </Button>
+                </Popconfirm>
+              </div>
+            </div>
+          </Form>
+        </Card>
+
+        <Card title="导入区状态" className="page-section-card">
+          <div className="page-stat-grid">
+            <div className="page-stat-tile">
+              <div className="page-stat-label">Connected Shops</div>
+              <div className="page-stat-value">{shops.data?.length ?? 0}</div>
+              <div className="page-stat-help">可作为导入归属的店铺数量。</div>
+            </div>
+            <div className="page-stat-tile">
+              <div className="page-stat-label">Latest Batch</div>
+              <div className="page-stat-value">{batchRows[0]?.id ?? "-"}</div>
+              <div className="page-stat-help">最近一个导入批次的编号。</div>
+            </div>
+            <div className="page-stat-tile">
+              <div className="page-stat-label">Completed</div>
+              <div className="page-stat-value">{batchRows.filter((item) => item.status === "completed").length}</div>
+              <div className="page-stat-help">已完成导入的批次数。</div>
+            </div>
+            <div className="page-stat-tile">
+              <div className="page-stat-label">Source Scope</div>
+              <div className="page-stat-value">
+                <ShopOutlined />
+              </div>
+              <div className="page-stat-help">可按店铺隔离导入，也支持全局导入。</div>
+            </div>
+          </div>
+        </Card>
+      </div>
+
+      <Card title="导入批次" className="page-table-card">
         <Table
           rowKey="id"
-          dataSource={batches.data ?? []}
+          dataSource={batchRows}
           columns={[
             { title: "批次 ID", dataIndex: "id" },
             { title: "类型", dataIndex: "report_type", render: (value: string) => batchTypeLabels[value] ?? value },

@@ -23,6 +23,7 @@ def list_providers(db: Session = Depends(get_db)) -> dict:
                 "base_url": config.base_url,
                 "model": config.model,
                 "enabled": config.enabled,
+                "has_api_key": bool(config.api_key_encrypted),
             }
             for config in configs
         ],

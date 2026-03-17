@@ -20,7 +20,7 @@ import {
   Typography,
   message,
 } from "antd";
-import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
+import { ControlOutlined, DeleteOutlined, EditOutlined, PlusOutlined, RadarChartOutlined, TagsOutlined } from "@ant-design/icons";
 
 import { api } from "../services/api";
 import type { CombinationRule, PerformanceRule, RuleCondition, RuleGroup } from "../types/api";
@@ -54,6 +54,9 @@ export function RulesPage() {
   }, [ruleGroups.data]);
 
   const fieldOptions = ruleGroups.data?.field_options ?? [];
+  const combinationRules = combinations.data?.rules ?? [];
+  const totalRules = groupDrafts.reduce((sum, group) => sum + group.rules.length, 0);
+  const activeGroups = groupDrafts.filter((group) => group.is_active).length;
 
   const refreshAll = async () => {
     await Promise.all([
@@ -172,11 +175,45 @@ export function RulesPage() {
   }
 
   return (
-    <Space direction="vertical" size={24} style={{ display: "flex" }}>
-      <div>
-        <Title level={2}>规则配置</Title>
-        <Paragraph>规则和策略现在都按卡片矩阵来排，一眼就能看到同一组里有哪些规则。</Paragraph>
-      </div>
+    <Space direction="vertical" size={24} style={{ display: "flex" }} className="page-layout">
+      <section className="page-hero">
+        <div className="page-hero-main">
+          <div className="page-kicker">Rule Matrix</div>
+          <Title className="page-title">把规则组和组合策略做成一套清晰的判断矩阵</Title>
+          <Paragraph className="page-summary">
+            这里负责维护表现标签和组合决策。先由规则组命中单点标签，再通过策略矩阵组合成最终动作，适合持续迭代运营逻辑。
+          </Paragraph>
+          <div className="page-chip-row">
+            <div className="page-chip">规则组</div>
+            <div className="page-chip">条件表达式</div>
+            <div className="page-chip">组合策略</div>
+          </div>
+        </div>
+
+        <aside className="page-hero-side">
+          <div className="page-side-kicker">Rule Pulse</div>
+          <div className="page-side-value">{groupDrafts.length}</div>
+          <div className="page-side-copy">当前规则组数量</div>
+          <div className="page-side-grid">
+            <div className="page-side-metric">
+              <span>总规则数</span>
+              <strong>{totalRules}</strong>
+            </div>
+            <div className="page-side-metric">
+              <span>启用组</span>
+              <strong>{activeGroups}</strong>
+            </div>
+            <div className="page-side-metric">
+              <span>组合策略</span>
+              <strong>{combinationRules.length}</strong>
+            </div>
+            <div className="page-side-metric">
+              <span>字段维度</span>
+              <strong>{fieldOptions.length}</strong>
+            </div>
+          </div>
+        </aside>
+      </section>
 
       <Alert
         type="info"
@@ -184,6 +221,36 @@ export function RulesPage() {
         message="逻辑说明"
         description="每个规则组会先命中一条表现标签，再由策略矩阵按多个标签组合生成最终动作。组与组之间是叠加关系，策略条件支持多标签多选。"
       />
+
+      <Row gutter={[16, 16]}>
+        <Col xs={24} md={8}>
+          <Card className="page-section-card">
+            <div className="page-stat-label">Rule Groups</div>
+            <div className="page-stat-value">
+              <ControlOutlined /> {groupDrafts.length}
+            </div>
+            <div className="page-stat-help">表现标签按组维护，便于分层管理和排序。</div>
+          </Card>
+        </Col>
+        <Col xs={24} md={8}>
+          <Card className="page-section-card">
+            <div className="page-stat-label">Rules</div>
+            <div className="page-stat-value">
+              <TagsOutlined /> {totalRules}
+            </div>
+            <div className="page-stat-help">所有规则组下累计的规则条目数。</div>
+          </Card>
+        </Col>
+        <Col xs={24} md={8}>
+          <Card className="page-section-card">
+            <div className="page-stat-label">Strategy Matrix</div>
+            <div className="page-stat-value">
+              <RadarChartOutlined /> {combinationRules.length}
+            </div>
+            <div className="page-stat-help">按多标签组合生成最终动作建议的策略数。</div>
+          </Card>
+        </Col>
+      </Row>
 
       <Space direction="vertical" size={20} style={{ display: "flex" }}>
         {groupDrafts.length ? (

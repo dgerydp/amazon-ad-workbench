@@ -1,3 +1,4 @@
+import { DownloadOutlined, FileExcelOutlined, FolderOpenOutlined, LineChartOutlined } from "@ant-design/icons";
 import { Alert, Button, Card, Col, Row, Space, Tag, Typography } from "antd";
 
 import { api } from "../services/api";
@@ -30,11 +31,45 @@ const exportsConfig: ExportItem[] = [
 
 export function ExportsPage() {
   return (
-    <Space direction="vertical" size={24} style={{ display: "flex" }}>
-      <div>
-        <Title level={2}>导出</Title>
-        <Paragraph>分析完成后，可以在这里导出 CSV 或完整 Excel 工作簿，用于复盘、共享和后续运营处理。</Paragraph>
-      </div>
+    <Space direction="vertical" size={24} style={{ display: "flex" }} className="page-layout">
+      <section className="page-hero">
+        <div className="page-hero-main">
+          <div className="page-kicker">Export Desk</div>
+          <Title className="page-title">把分析结果导成真正能发出去、能执行、能复盘的文件</Title>
+          <Paragraph className="page-summary">
+            导出页不应该只是几个下载按钮。这里把不同输出场景拆开，让你能快速拿到高表现词、否词建议和 sellerSKU 汇总，也保留完整工作簿一次性打包。
+          </Paragraph>
+          <div className="page-chip-row">
+            <div className="page-chip">CSV 按场景导出</div>
+            <div className="page-chip">完整 Excel 工作簿</div>
+            <div className="page-chip">适合复盘、协作和运营执行</div>
+          </div>
+        </div>
+
+        <aside className="page-hero-side">
+          <div className="page-side-kicker">Export Pulse</div>
+          <div className="page-side-value">{exportsConfig.length}</div>
+          <div className="page-side-copy">已提供的专项导出类型</div>
+          <div className="page-side-grid">
+            <div className="page-side-metric">
+              <span>CSV 导出</span>
+              <strong>{exportsConfig.length}</strong>
+            </div>
+            <div className="page-side-metric">
+              <span>完整工作簿</span>
+              <strong>1</strong>
+            </div>
+            <div className="page-side-metric">
+              <span>输出格式</span>
+              <strong>2</strong>
+            </div>
+            <div className="page-side-metric">
+              <span>目标</span>
+              <strong>Ops</strong>
+            </div>
+          </div>
+        </aside>
+      </section>
 
       <Alert
         type="info"
@@ -44,16 +79,17 @@ export function ExportsPage() {
       />
 
       <Row gutter={[16, 16]}>
-        {exportsConfig.map((item) => (
+        {exportsConfig.map((item, index) => (
           <Col xs={24} md={12} xl={8} key={item.key}>
-            <Card className="export-card" style={{ borderRadius: 20 }}>
+            <Card className="export-card page-section-card">
               <Space direction="vertical" size={16} style={{ display: "flex" }}>
-                <Tag color="green">{item.key}</Tag>
+                <Tag color={index === 0 ? "green" : index === 1 ? "volcano" : "blue"}>{item.key}</Tag>
+                <div className="page-action-icon">{index === 0 ? <LineChartOutlined /> : index === 1 ? <DownloadOutlined /> : <FolderOpenOutlined />}</div>
                 <Title level={4} style={{ margin: 0 }}>
                   {item.title}
                 </Title>
                 <Paragraph style={{ marginBottom: 0 }}>{item.description}</Paragraph>
-                <Button type="primary" href={api.exportUrl(item.key)} target="_blank">
+                <Button type="primary" href={api.exportUrl(item.key)} target="_blank" icon={<DownloadOutlined />}>
                   下载 CSV
                 </Button>
               </Space>
@@ -62,11 +98,19 @@ export function ExportsPage() {
         ))}
       </Row>
 
-      <Card title="完整工作簿" style={{ borderRadius: 18 }}>
-        <Paragraph>如果你想一次性导出全部分析结果，直接下载完整 Excel 工作簿即可。</Paragraph>
-        <Button type="primary" href={api.excelExportUrl()} target="_blank">
-          下载完整 Excel
-        </Button>
+      <Card title="完整工作簿" className="page-section-card">
+        <div className="page-action-grid">
+          <div className="page-action-card">
+            <div className="page-action-icon">
+              <FileExcelOutlined />
+            </div>
+            <div className="page-action-title">完整导出</div>
+            <div className="page-action-copy">如果你想一次性导出全部分析结果，直接下载完整 Excel 工作簿即可。</div>
+            <Button type="primary" href={api.excelExportUrl()} target="_blank" icon={<DownloadOutlined />}>
+              下载完整 Excel
+            </Button>
+          </div>
+        </div>
       </Card>
     </Space>
   );
