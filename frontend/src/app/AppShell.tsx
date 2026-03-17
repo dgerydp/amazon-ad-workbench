@@ -24,7 +24,7 @@ const ExportsPage = lazy(() => import("../pages/ExportsPage").then((module) => (
 const DocsPage = lazy(() => import("../pages/DocsPage").then((module) => ({ default: module.DocsPage })));
 
 const { Content, Header, Sider } = Layout;
-const { Paragraph, Text, Title } = Typography;
+const { Text } = Typography;
 
 const menuItems = [
   { key: "/dashboard", icon: <HomeOutlined />, label: "总览", description: "查看报表规模、规则命中和标签分布。" },
@@ -45,23 +45,15 @@ function ShellLayout() {
 
   return (
     <Layout className="app-shell">
-      <Sider className="app-sider" theme="light" width={296} breakpoint="lg" collapsedWidth={0}>
-        <div className="app-brand">
-          <div className="app-brand-stack">
-            <div className="app-brand-logo">
-              <span className="app-brand-logo-core">A</span>
-            </div>
-            <div>
-              <div className="app-brand-mark">Amazon Ads</div>
-              <Title level={4} className="app-brand-title">
-                Signal Workbench
-              </Title>
-              <Text className="app-brand-subtitle">sellerSKU 驱动的广告分析台</Text>
-            </div>
+      <Sider className="app-sider" theme="light" width={228} breakpoint="lg" collapsedWidth={0}>
+        <div className="app-brand app-brand-minimal">
+          <div className="app-brand-logo">
+            <span className="app-brand-logo-core">S</span>
           </div>
-          <Paragraph className="app-brand-copy">
-            把搜索词、规则、标签和导出动作收拢到一个更清晰的工作流里。
-          </Paragraph>
+          <div className="app-brand-copyline">
+            <div className="app-brand-title">广告分析台</div>
+            <Text className="app-brand-caption">sellerSKU</Text>
+          </div>
         </div>
         <Menu
           className="app-menu"
@@ -70,30 +62,15 @@ function ShellLayout() {
           items={menuItems.map(({ description, ...item }) => item)}
           onClick={({ key }) => navigate(key)}
         />
-        <div className="app-sider-foot">
-          <div className="app-sider-foot-label">Current Module</div>
-          <div className="app-sider-foot-value">{currentSection.label}</div>
-          <Text className="app-sider-foot-copy">{currentSection.description}</Text>
-        </div>
       </Sider>
       <Layout className="app-main">
         <Header className="app-header">
-          <div className="app-header-panel">
-            <div className="app-header-copy">
-              <Text className="app-header-kicker">Amazon Ads Signal Deck</Text>
-              <Title level={2} className="app-header-title">
-                亚马逊广告分析工作台
-              </Title>
-              <Paragraph className="app-header-summary">
-                围绕 sellerSKU 聚合报表、规则、标签和导出动作，快速定位值得放大和该及时处理的关键词信号。
-              </Paragraph>
+          <div className="app-topbar">
+            <div>
+              <div className="app-topbar-title">亚马逊广告分析工作台</div>
+              <Text className="app-topbar-subtitle">{currentSection.description}</Text>
             </div>
-            <div className="app-header-meta">
-              <div className="app-header-chip app-header-chip-active">{currentSection.label}</div>
-              <div className="app-header-chip">sellerSKU Core</div>
-              <div className="app-header-chip">Signal Driven</div>
-            </div>
-            <div className="app-header-orb" />
+            <div className="app-topbar-tag">{currentSection.label}</div>
           </div>
         </Header>
         <Content className="app-content">
