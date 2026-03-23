@@ -8,6 +8,7 @@ import pandas as pd
 SEARCH_TERM_COLUMN_MAP = {
     "Date": "date",
     "日期": "date",
+    "开始日期": "date",
     "Campaign Name": "campaign_name",
     "广告活动名称": "campaign_name",
     "Ad Group Name": "ad_group_name",
@@ -34,6 +35,7 @@ SEARCH_TERM_COLUMN_MAP = {
 ADVERTISED_PRODUCT_COLUMN_MAP = {
     "Date": "date",
     "日期": "date",
+    "开始日期": "date",
     "Campaign Name": "campaign_name",
     "广告活动名称": "campaign_name",
     "Ad Group Name": "ad_group_name",
@@ -81,12 +83,31 @@ def normalize_columns(df: pd.DataFrame, report_type: str) -> pd.DataFrame:
     return normalized
 
 
+_DATE_FORMATS = [
+    "%Y年%m月%d日",
+    "%m/%d/%Y",
+    "%d/%m/%Y",
+    "%Y/%m/%d",
+]
+
+
 def normalize_date_value(value) -> str:
     if pd.isna(value):
         return ""
-    timestamp = pd.to_datetime(value, errors="coerce")
+    raw = str(value).strip()
+    # Handle date-range strings like "2024-12-01 - 2024-12-07": take the first date
+    if " - " in raw:
+        raw = raw.split(" - ")[0].strip()
+    timestamp = pd.to_datetime(raw, errors="coerce")
     if pd.isna(timestamp):
-        return str(value).strip()
+        for fmt in _DATE_FORMATS:
+            try:
+                timestamp = pd.to_datetime(raw, format=fmt)
+                break
+            except (ValueError, TypeError):
+                continue
+    if pd.isna(timestamp):
+        return ""
     return timestamp.strftime("%Y-%m-%d")
 
 
