@@ -122,8 +122,16 @@ def build_tokens(db: Session, shop_id: int | None = None) -> dict[str, int]:
 
     created = 0
     for report in reports:
-        report_links = link_map.get(report.id) or [None]
-        tokens = tokenize(report.search_term)
+        raw_links = link_map.get(report.id) or [None]
+        # Deduplicate by seller_sku to avoid UNIQUE constraint violation
+        seen_skus: set = set()
+        report_links = []
+        for lnk in raw_links:
+            sku = lnk.seller_sku if lnk else None
+            if sku not in seen_skus:
+                seen_skus.add(sku)
+                report_links.append(lnk)
+        tokens = list(dict.fromkeys(tokenize(report.search_term)))
         for token in tokens:
             for link in report_links:
                 db.add(
@@ -175,6 +183,7 @@ def run_full_analysis(
             "rules": rule_result,
         }
     except Exception as exc:
+        db.rollback()
         job.status = "failed"
         job.error_message = str(exc)[:500]
     db.add(job)

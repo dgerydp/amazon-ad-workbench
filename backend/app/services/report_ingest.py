@@ -26,7 +26,11 @@ def persist_batch_rows(
     }[report_type]
     missing = sorted(required_columns - set(df.columns))
     if missing:
-        raise HTTPException(status_code=400, detail=f"Missing required columns: {', '.join(missing)}")
+        found = sorted(df.columns.tolist())
+        raise HTTPException(
+            status_code=400,
+            detail=f"Missing required columns: {', '.join(missing)}. Found columns: {', '.join(found)}",
+        )
 
     dates: list[str] = []
     grouped_rows: dict[tuple, dict] = defaultdict(
